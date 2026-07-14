@@ -22,28 +22,25 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ${{ secrets.jeeva0312 }}/portfolio-website:latest .
+          docker build -t jeeva0312/portfolio-website:latest .
 
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.jeeva0312 }}/portfolio-website:latest
+          docker push jeeva0312/portfolio-website:latest
 
   deploy:
     needs: docker-build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to VM
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
-
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
-
           script: |
-            docker pull ${{ secrets.jeeva0312 }}/portfolio-website:latest
+            docker pull jeeva0312/portfolio-website:latest
             docker stop app || true
             docker rm app || true
-            docker run -d --name app -p 8080:80 \
-            ${{ secrets.jeeva0312 }}/portfolio-website:latest
+            docker run -d --name app -p 8080:80 jeeva0312/portfolio-website:latest
